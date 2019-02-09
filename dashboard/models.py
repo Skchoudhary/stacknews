@@ -13,10 +13,13 @@ class BasicDetails(models.Model):
     Common fields to all models
     """
     creation_date = models.DateTimeField(default=timezone.now)
-    last_modification_date = models.DateTimeField(default=timezone.now(), auto_now=True)
+    last_modification_date = models.DateTimeField(auto_now=True)
 
     is_active = BooleanField(default=True)
     to_show = BooleanField(default=True)
+
+    class Meta:
+        abstract = True
 
 
 class Post(BasicDetails):
@@ -35,17 +38,17 @@ class Comment(BasicDetails):
     """
     Details about the comment on the post.
     """
-    post = models.ForeignKey(Post, null=False)
+    post = models.ForeignKey(Post, related_name='%(class)s_comment_post', null=False)
     user = models.ForeignKey(User, null=False)
 
-    comment = CharField(max_length=3000, default='', blank=True)
+    comment_text = CharField(max_length=3000, default='', blank=True)
 
 
 class KarmaPoint(BasicDetails):
     """
     Count of the star/applause of the post.
     """
-    post = models.ForeignKey(Post, null=False)
+    post = models.ForeignKey(Post, related_name='%(class)s_karma_post', null=False)
     user = models.ForeignKey(User, null=False)
 
     count = IntegerField(default=0, null=False)

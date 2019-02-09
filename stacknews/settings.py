@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'dashboard',
 ]
 
 MIDDLEWARE = [
@@ -83,7 +84,7 @@ WSGI_APPLICATION = 'stacknews.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': config.get('database', 'name'),
+        'NAME': config.get('database', 'database'),
         'USER': config.get('database', 'user'),
         'PASSWORD': config.get('database', 'password'),
         'HOST': config.get('database', 'host'),
