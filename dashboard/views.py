@@ -4,14 +4,15 @@ from django.contrib.auth.models import User
 from django.db.models import Q
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login as auth_login, logout
-
-from dashboard.forms import UserForm
+from django.shortcuts import redirect
+278b3ee0c4dac1cbadd2d8c77da48220124a8636
+from dashboard.forms import UserForm, PostForm
 from dashboard.models import Post
 
 
 def latest_post(request):
     """
-    Fetch latest post shared
+    Fetch latest 20 post shared
     :param request:
     :return:
     """
@@ -20,6 +21,37 @@ def latest_post(request):
     post_list = [{'text': post.post_text, 'url': post.url, 'created_by': post.created_by} for post in post_obj]
 
     return HttpResponse(json.dumps({'flag': 'error'}), content_type='application/json')
+
+
+def add_post(request):
+    """
+
+    :param request:
+    :return:
+    """
+    response = {'status': 'failure'}
+
+    post_data = PostForm({'post_url': request.POST.get('post_type', 'P'), 'post_text': request.POST.get('text', ''), 'url': request.POST.get('url', ''), 'created_by_id': request.user})
+    if post_data.is_vald():
+        post_data.save()
+        response['status'] = 'success'
+
+    return redirect('/dashboard/landing_view')
+
+
+def remove_post(request):
+    """
+
+    :param request:
+    :return:
+    """
+    post_id = request.POST.get('post_id', '')
+    post_obj = Post.objects.filter(Q(to_show=1) & Q(active=1)).filter(pk=post_id)
+
+    if post_obj:
+        post_obj.update(active=0, to_show=0)
+
+    return redirect('/dashboard/landing_view')
 
 
 def create_new_user(request):
