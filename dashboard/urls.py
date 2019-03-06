@@ -7,5 +7,6 @@ ajax_url = [
 
 urlpatterns = [
 
+    url(r'^$', latest_post, name='dashboard_page'),
     url(r'^api/', include(ajax_url)),
 ]

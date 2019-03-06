@@ -17,5 +17,14 @@
     <a class="nav-link" href="#">Submit</a>
   <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
 </nav>
+
+<div>
+  {% for post in posts%}
+  <div>
+    <span>{{ post.name }}</span>
+    
+  </div>
+  {%endfor%}
+</div>
 </body>
 </html>

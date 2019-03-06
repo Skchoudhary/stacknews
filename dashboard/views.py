@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.db.models import Q
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login as auth_login, logout
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from dashboard.forms import UserForm, PostForm
 from dashboard.models import Post
 
@@ -17,7 +17,7 @@ def latest_post(request):
     """
     post_obj = Post.objects.filter(is_active=True).filter(to_show=True).order_by('-creation_date')[:20]
 
-    return HttpResponse(json.dumps({'posts': post_obj}), content_type='application/json')
+    return render(request, 'dashboard/main_post.html', {'post_obj': post_obj})
 
 
 def add_post(request):
