@@ -1,3 +1,7 @@
+{% load i18n admin_static %}
+{% load staticfiles %}
+{% load i18n %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,26 +9,30 @@
     <title>Stack News Post</title>
 </head>
 <body>
+
+<link href="{% static 'bootstrap/css/bootstrap.css' %}" rel="stylesheet" type="text/css"/>
+
 <nav class="nav">
-  <a class="nav-link active" href="#">Stack News</a>
-  <a class="nav-link" href="#">New</a>
-  <a class="nav-link" href="#">Thread</a>
+    <a class="nav-link active" href="#">Stack News</a>
+    <a class="nav-link" href="#">New</a>
+    <a class="nav-link" href="#">Thread</a>
     <a class="nav-link" href="#">Past</a>
     <a class="nav-link" href="#">Comment</a>
     <a class="nav-link" href="#">Ask</a>
     <a class="nav-link" href="#">Show</a>
     <a class="nav-link" href="#">Job</a>
     <a class="nav-link" href="#">Submit</a>
-  <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
 </nav>
 
 <div>
-  {% for post in posts%}
-  <div>
-    <span>{{ post.name }}</span>
-    
-  </div>
-  {%endfor%}
+    {% for post in posts%}
+    <div>
+        <span>{{ post.name }}</span>
+
+    </div>
+    {%endfor%}
 </div>
+
+ <script src="{% static 'bootstrap/js/bootstrap.js' %}" type="text/javascript"></script>
 </body>
 </html>
