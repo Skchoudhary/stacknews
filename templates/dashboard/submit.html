@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Submit | Stack News</title>
+</head>
+<body>
+<div>
+    <form action="{{ post_submit }}" type="POST" name="post" id="post">
+
+        <div class="row">
+            <label class="col-md-6">Title</label>
+            <input class="col-md-6" id="post_title" name="post_title">
+        </div>
+
+        <div class="row">
+            <label class="col-md-6">Url</label>
+            <input class="col-md-6" id="post_URL" name="post_URL">
+        </div>
+        <br>
+        <span> or </span>
+        <br>
+        <div class="row">
+            <label class="col-md-6">Text</label>
+            <textarea class="col-md-6" id="post_text" name="post_text"></textarea>
+        </div>
+        <button type="submit"> Submit</button>
+    </form>
+</div>
+</body>
+</html>

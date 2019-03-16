@@ -28,7 +28,7 @@ def add_post(request):
     """
     response = {'status': 'failure'}
 
-    post_data = PostForm({'post_url': request.POST.get('post_type', 'P'), 'post_text': request.POST.get('text', ''), 'url': request.POST.get('url', ''), 'created_by_id': request.user})
+    post_data = PostForm({'post_url': request.POST.get('post_type', 'P'), 'title': request.POST.get('post_title', ''), 'post_text': request.POST.get('post_text', ''), 'url': request.POST.get('post_URL', ''), 'created_by_id': request.user})
     if post_data.is_vald():
         post_data.save()
         response['status'] = 'success'
@@ -117,3 +117,11 @@ def remove_user(request):
         response['status'] = 'success'
 
     return HttpResponse(json.dumps(response), content_type='application/json')
+
+
+def login(request):
+    """
+
+    :param request:
+    :return:
+    """
