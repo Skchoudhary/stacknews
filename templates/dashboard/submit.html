@@ -4,28 +4,45 @@
     <meta charset="UTF-8">
     <title>Submit | Stack News</title>
 </head>
-<body>
-<div>
-    <form action="{{ post_submit }}" type="POST" name="post" id="post">
+<body class="page-header-fixed page-sidebar-closed-hide-logo page-content-white page-container-bg-solid">
+{#<div class="page-wrapper">#}
+{#    <div class="page-content-wrapper">#}
+{#        <div class="page-container">#}
+{#            <div class="page-content">#}
+                <div class="row">
 
-        <div class="row">
-            <label class="col-md-6">Title</label>
-            <input class="col-md-6" id="post_title" name="post_title">
-        </div>
+{#                    <div class="portlet">#}
+                        <div class="col-md-2" style="background-color: red"></div>
+                        <div class="col-md-2 centre" style="background-color: #5a6268">
 
-        <div class="row">
-            <label class="col-md-6">Url</label>
-            <input class="col-md-6" id="post_URL" name="post_URL">
-        </div>
-        <br>
-        <span> or </span>
-        <br>
-        <div class="row">
-            <label class="col-md-6">Text</label>
-            <textarea class="col-md-6" id="post_text" name="post_text"></textarea>
-        </div>
-        <button type="submit"> Submit</button>
-    </form>
-</div>
+                                <form action="/dashboard/post_submit/" method="post" name="news_post" id="news_post">
+                                    {% csrf_token %}
+                                    <div class="row">
+                                        <label class="col-md-6 form-control">Title</label>
+                                        <input class="col-md-6 form-control" id="post_title" name="post_title">
+                                    </div>
+
+                                    <div class="row">
+                                        <label class="col-md-6 form-control">Url</label>
+                                        <input class="col-md-6 form-control" id="post_URL" name="post_URL">
+                                    </div>
+                                    <br>
+                                    <span> or </span>
+                                    <br>
+                                    <div class="row">
+                                        <label class="col-md-6 form-control">Text</label>
+                                        <textarea class="col-md-6 form-control" id="post_text" name="post_text"></textarea>
+                                    </div>
+                                    <button type="submit"> Submit</button>
+                                </form>
+
+                        </div>
+{#                    </div>#}
+                    <div class="col-md-2"></div>
+                </div>
+{#            </div>#}
+{#        </div>#}
+{#    </div>#}
+{#</div>#}
 </body>
 </html>

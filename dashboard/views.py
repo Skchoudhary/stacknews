@@ -1,12 +1,18 @@
 import json
+import logging
 
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.db.models import Q
 from django.http import HttpResponse
-from django.contrib.auth import authenticate, login as auth_login, logout
+from django.contrib.auth import authenticate, login as auth_login, logout, login
 from django.shortcuts import redirect, render
 from dashboard.forms import UserForm, PostForm
 from dashboard.models import Post
+
+
+# Constants
+logger = logging.getLogger(__name__)
 
 
 def latest_post(request):
@@ -15,11 +21,13 @@ def latest_post(request):
     :param request:
     :return:
     """
+    logger.info('In method Latest Post')
     post_obj = Post.objects.filter(is_active=True).filter(to_show=True).order_by('-creation_date')[:20]
-
+    logger.info('Post Obj' + str(post_obj))
     return render(request, 'dashboard/main_post.html', {'post_obj': post_obj})
 
 
+@login_required(login_url='/')
 def add_post(request):
     """
 
@@ -28,12 +36,18 @@ def add_post(request):
     """
     response = {'status': 'failure'}
 
-    post_data = PostForm({'post_url': request.POST.get('post_type', 'P'), 'title': request.POST.get('post_title', ''), 'post_text': request.POST.get('post_text', ''), 'url': request.POST.get('post_URL', ''), 'created_by_id': request.user})
-    if post_data.is_vald():
+    logger.info('Title ::' + str(request.POST['post_title']))
+
+    logger.info('data request ::' + str({'post_type': request.POST.get('post_type', 'P'), 'title': request.POST.get('post_title', ''), 'post_text': request.POST.get('post_text', ''), 'url': request.POST.get('post_URL', ''), 'created_by': request.user.id}))
+
+    post_data = PostForm({'post_type': request.POST.get('post_type', 'P'), 'title': request.POST.get('post_title', ''), 'post_text': request.POST.get('post_text', ''), 'url': request.POST.get('post_URL', ''), 'created_by': request.user.id})
+    if post_data.is_valid():
         post_data.save()
         response['status'] = 'success'
+    else:
+        logger.error('Error while saving the post ' + str(post_data.errors))
 
-    return redirect('/dashboard/landing_view')
+    return redirect('/')
 
 
 def remove_post(request):
@@ -58,21 +72,22 @@ def create_new_user(request):
     :return:
     """
 
-    user_id = request.POST.get('user_id', '')
+    user_id = request.POST.get('user_name', '')
     password = request.POST.get('password', '')
-    email = request.POST.get('email', '')
-    name = request.POST.get('name', '')
+    name = request.POST.get('user_name', '')
     msg = {}
 
-    if user_id and password and email:
-        user_detail = UserForm({'email': email, 'password': password, 'username': user_id, 'name': name})
+    if user_id and password:
+        user_detail = UserForm({'password': password, 'username': user_id, 'name': name})
 
         if user_detail.is_valid():
-            user_detail.save()
+            user_detail = User.objects.create_user(**user_detail.cleaned_data)
+            # user_detail.save()
             msg['user_id'] = user_detail
             msg['status'] = 'success'
         else:
             msg['status'] = 'failure'
+            logger.info('Error while creating user :' + str(user_detail.errors))
 
         return HttpResponse(json.dumps(msg), content_type='application/json')
 
@@ -119,9 +134,47 @@ def remove_user(request):
     return HttpResponse(json.dumps(response), content_type='application/json')
 
 
-def login(request):
+def login_view(request):
     """
 
     :param request:
     :return:
     """
+    logger.info('new login page request12')
+    return render(request, 'dashboard/login.html')
+
+
+def stocknews_login(request):
+    """
+    Method to authenticate the user.
+    :param request:
+    :return:
+    """
+    request_type = request.POST.get('form_type', '')
+
+    if request_type == 'new_user':
+        create_new_user(request)
+
+    elif request_type == 'login':
+
+        username = request.POST.get('user_name', '')
+        password = request.POST.get('password', '')
+        user = authenticate(username=username, password=password)
+        if user:
+            login(request, user)
+            return redirect('/')
+
+        else:
+            logger.error("Authentication failed" + str(password) + str(username))
+            return render(request, 'dashboard/login.html', {'error_msg': 'Authentication failed', })
+
+
+# @login_required(login_url='/login/')
+def new_post(request):
+    """
+    
+    :param request: 
+    :return: 
+    """
+
+    return render(request, 'dashboard/submit.html')

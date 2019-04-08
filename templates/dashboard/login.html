@@ -6,7 +6,8 @@
 </head>
 <body>
 <div>
-    <form action="{{ login }}">
+    <form action="/dashboard/login/" method="post" class="horizontal-form" enctype="multipart/form-data">
+        {% csrf_token %}
         <div class="row">
             <label class="col-md-6">User name</label>
             <input class="col-md-6" id="user_name" name="user_name">
@@ -17,21 +18,23 @@
             <input class="col-md-6" id="password" name="password">
         </div>
 
+        <input name="form_type" id="form_type" value="login">
         <button type="submit"> Login</button>
     </form>
 
 
-    <form action="{{ create_new_user }}" >
-        <div class="row">
+    <form action="/dashboard/login/" method="post" class="horizontal-form" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="row form-group">
             <label class="col-md-6">User name</label>
             <input class="col-md-6" id="user_name" name="user_name">
         </div>
 
-        <div class="row">
+        <div class="row form-group">
             <label class="col-md-6">password</label>
             <input class="col-md-6" id="password" name="password">
         </div>
-
+        <input name="form_type" id="form_type" value="new_user">
         <button type="submit"> Login</button>
     </form>
 
