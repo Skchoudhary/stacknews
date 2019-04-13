@@ -9,13 +9,21 @@
 
 {% block content %}
 
-    <div>
-        {% for post in post_obj %}
-            <div>
-                <span>{{ post.title }}</span>
+    <div style="margin-top: 1%">
+        <div class="container" style="background-color: lightcyan; max-height: 100%;">
 
-            </div>
-        {% endfor %}
+            {% for post in post_obj %}
+                <h4>{{ post.title }}</h4>
+                <div class="row">
+                    <div class="col-md-6 col-xs-6 col-lg-6">
+                        {% if post.post_text %}<p class="">{{ post.post_text }}</p>{% endif %}
+                    </div>
+                    <div class="col-md-6 col-xs-6 col-lg-6" style="text-align: right">
+                        <span class="pull-right right">-- by {{ post.created_by.first_name }}</span>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
     </div>
 
 {% endblock %}

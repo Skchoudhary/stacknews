@@ -78,7 +78,7 @@ def create_new_user(request):
     msg = {}
 
     if user_id and password:
-        user_detail = UserForm({'password': password, 'username': user_id, 'name': name})
+        user_detail = UserForm({'password': password, 'username': user_id, 'first_name': name})
 
         if user_detail.is_valid():
             user_detail = User.objects.create_user(**user_detail.cleaned_data)
