@@ -1,12 +1,17 @@
 import json
+import logging
 
-from django.contrib.auth.models import User
-from django.db.models import Q
-from django.http import HttpResponse
-from django.contrib.auth import authenticate, login as auth_login, logout
-from django.shortcuts import redirect, render
-from dashboard.forms import UserForm, PostForm
-from dashboard.models import Post
+from django.contrib.auth.decorators import (login_required)
+from django.contrib.auth.models import (User)
+from django.db.models import (Q)
+from django.http import (HttpResponse)
+from django.contrib.auth import (authenticate, login as auth_login, logout, login)
+from django.shortcuts import (redirect, render)
+from dashboard.forms import (UserForm, PostForm, CommentForm)
+from dashboard.models import (Post)
+
+# Constants
+logger = logging.getLogger(__name__)
 
 
 def latest_post(request):
@@ -20,6 +25,7 @@ def latest_post(request):
     return render(request, 'dashboard/main_post.html', {'post_obj': post_obj})
 
 
+@login_required(login_url='/')
 def add_post(request):
     """
 
@@ -28,12 +34,14 @@ def add_post(request):
     """
     response = {'status': 'failure'}
 
-    post_data = PostForm({'post_url': request.POST.get('post_type', 'P'), 'title': request.POST.get('post_title', ''), 'post_text': request.POST.get('post_text', ''), 'url': request.POST.get('post_URL', ''), 'created_by_id': request.user})
-    if post_data.is_vald():
+    post_data = PostForm({'post_type': request.POST.get('post_type', 'P'), 'title': request.POST.get('post_title', ''), 'post_text': request.POST.get('post_text', ''), 'url': request.POST.get('post_URL', ''), 'created_by': request.user.id})
+    if post_data.is_valid():
         post_data.save()
         response['status'] = 'success'
+    else:
+        logger.error('Error while saving the post ' + str(post_data.errors))
 
-    return redirect('/dashboard/landing_view')
+    return redirect('/')
 
 
 def remove_post(request):
@@ -58,21 +66,22 @@ def create_new_user(request):
     :return:
     """
 
-    user_id = request.POST.get('user_id', '')
+    user_id = request.POST.get('user_name', '')
     password = request.POST.get('password', '')
-    email = request.POST.get('email', '')
-    name = request.POST.get('name', '')
+    name = request.POST.get('user_name', '')
     msg = {}
 
-    if user_id and password and email:
-        user_detail = UserForm({'email': email, 'password': password, 'username': user_id, 'name': name})
+    if user_id and password:
+        user_detail = UserForm({'password': password, 'username': user_id, 'first_name': name})
 
         if user_detail.is_valid():
-            user_detail.save()
+            user_detail = User.objects.create_user(**user_detail.cleaned_data)
+            # user_detail.save()
             msg['user_id'] = user_detail
             msg['status'] = 'success'
         else:
             msg['status'] = 'failure'
+            logger.info('Error while creating user :' + str(user_detail.errors))
 
         return HttpResponse(json.dumps(msg), content_type='application/json')
 
@@ -107,7 +116,6 @@ def update_password(request):
 
 
 def remove_user(request):
-
     user_id = request.POST('user_id', '')
     user_details = User.objects.filter(Q(to_show=1) & Q(active=1)).filter(username=user_id)
     response = {'status': 'failure'}
@@ -119,9 +127,87 @@ def remove_user(request):
     return HttpResponse(json.dumps(response), content_type='application/json')
 
 
-def login(request):
+def stocknews_login(request):
     """
-
+    Method to authenticate the user.
     :param request:
     :return:
     """
+    request_type = request.POST.get('form_type', '')
+
+    if request_type == 'new_user':
+        create_new_user(request)
+
+    elif request_type == 'login':
+
+        username = request.POST.get('user_name', '')
+        password = request.POST.get('password', '')
+        user = authenticate(username=username, password=password)
+        if user:
+            login(request, user)
+            return redirect('/')
+
+        else:
+            logger.error("Authentication failed" + str(password) + str(username))
+            return render(request, 'dashboard/login.html', {'error_msg': 'Authentication failed', })
+
+
+@login_required(login_url='/login/')
+def new_post(request):
+    """
+    
+    :param request: 
+    :return: 
+    """
+
+    return render(request, 'dashboard/submit.html')
+
+
+@login_required(login_url='/login/')
+def comment(request):
+    """
+    Comment save method against a post.
+    :param request:
+    :return:
+    """
+    comment_text = request.POST.get('comment', '')
+    linked_post = request.POST.get('linked_post', '')
+
+    comment_is_valid = CommentForm({'post': linked_post, 'comment_text': comment_text, 'user': request.user.id})
+
+    if comment_is_valid.is_valid():
+        comment_is_valid.save()
+    else:
+        logger.info('Comment data is invalid ' + str(comment_is_valid.errors))
+
+    return redirect('/')
+
+
+@login_required(login_url='/login/')
+def log_out(request):
+    """
+    Safely log out the user from the system.
+    :param request:
+    :return:
+    """
+    user = request.user
+    if user:
+        logout(request)
+
+    return render(request, 'dashboard/login.html', {'error_msg': 'User safely log out of the system', })
+
+
+@login_required(login_url='/login/')
+def render_comment_page(request):
+    """
+    Render Comment page for the selected Post.
+    :param request:
+    :return:
+    """
+    logger.info('Opening connecting comment page for Post.')
+
+    post_id = request.POST.get('post_id', '')
+    post_object = Post.objects.filter(id=post_id).first()
+
+    return render(request, 'dashboard/comment.html', {'post': post_object})
+

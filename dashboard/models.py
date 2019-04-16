@@ -5,7 +5,11 @@ from django.db.models import CharField, URLField, IntegerField, BooleanField
 # CONSTANTS
 from django.utils import timezone
 
-POST_TYPE = (('P', 'Post'), ('J', 'Job Post'), ('AMA', 'Ask Me Anything'))
+POST_TYPE = (
+    ('P', 'Post'),
+    ('J', 'Job Post'),
+    ('AMA', 'Ask Me Anything'),
+)
 
 
 class BasicDetails(models.Model):
@@ -31,7 +35,7 @@ class Post(BasicDetails):
     title = CharField(max_length=1000, default='', blank=True)
     url = URLField(max_length=1000, default='', blank=True)
     post_text = CharField(max_length=5000, default='', blank=True)
-    post_type = CharField(max_length=3, default='P', choices=POST_TYPE)
+    post_type = CharField(max_length=30, default='P', choices=POST_TYPE)
 
 
 class Comment(BasicDetails):
