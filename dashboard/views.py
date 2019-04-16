@@ -1,15 +1,14 @@
 import json
 import logging
 
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
-from django.db.models import Q
-from django.http import HttpResponse
-from django.contrib.auth import authenticate, login as auth_login, logout, login
-from django.shortcuts import redirect, render
-from dashboard.forms import UserForm, PostForm
-from dashboard.models import Post
-
+from django.contrib.auth.decorators import (login_required)
+from django.contrib.auth.models import (User)
+from django.db.models import (Q)
+from django.http import (HttpResponse)
+from django.contrib.auth import (authenticate, login as auth_login, logout, login)
+from django.shortcuts import (redirect, render)
+from dashboard.forms import (UserForm, PostForm, CommentForm)
+from dashboard.models import (Post)
 
 # Constants
 logger = logging.getLogger(__name__)
@@ -21,9 +20,8 @@ def latest_post(request):
     :param request:
     :return:
     """
-    logger.info('In method Latest Post')
     post_obj = Post.objects.filter(is_active=True).filter(to_show=True).order_by('-creation_date')[:20]
-    logger.info('Post Obj' + str(post_obj))
+
     return render(request, 'dashboard/main_post.html', {'post_obj': post_obj})
 
 
@@ -35,10 +33,6 @@ def add_post(request):
     :return:
     """
     response = {'status': 'failure'}
-
-    logger.info('Title ::' + str(request.POST['post_title']))
-
-    logger.info('data request ::' + str({'post_type': request.POST.get('post_type', 'P'), 'title': request.POST.get('post_title', ''), 'post_text': request.POST.get('post_text', ''), 'url': request.POST.get('post_URL', ''), 'created_by': request.user.id}))
 
     post_data = PostForm({'post_type': request.POST.get('post_type', 'P'), 'title': request.POST.get('post_title', ''), 'post_text': request.POST.get('post_text', ''), 'url': request.POST.get('post_URL', ''), 'created_by': request.user.id})
     if post_data.is_valid():
@@ -122,7 +116,6 @@ def update_password(request):
 
 
 def remove_user(request):
-
     user_id = request.POST('user_id', '')
     user_details = User.objects.filter(Q(to_show=1) & Q(active=1)).filter(username=user_id)
     response = {'status': 'failure'}
@@ -132,16 +125,6 @@ def remove_user(request):
         response['status'] = 'success'
 
     return HttpResponse(json.dumps(response), content_type='application/json')
-
-
-def login_view(request):
-    """
-
-    :param request:
-    :return:
-    """
-    logger.info('new login page request12')
-    return render(request, 'dashboard/login.html')
 
 
 def stocknews_login(request):
@@ -169,7 +152,7 @@ def stocknews_login(request):
             return render(request, 'dashboard/login.html', {'error_msg': 'Authentication failed', })
 
 
-# @login_required(login_url='/login/')
+@login_required(login_url='/login/')
 def new_post(request):
     """
     
@@ -178,3 +161,53 @@ def new_post(request):
     """
 
     return render(request, 'dashboard/submit.html')
+
+
+@login_required(login_url='/login/')
+def comment(request):
+    """
+    Comment save method against a post.
+    :param request:
+    :return:
+    """
+    comment_text = request.POST.get('comment', '')
+    linked_post = request.POST.get('linked_post', '')
+
+    comment_is_valid = CommentForm({'post': linked_post, 'comment_text': comment_text, 'user': request.user.id})
+
+    if comment_is_valid.is_valid():
+        comment_is_valid.save()
+    else:
+        logger.info('Comment data is invalid ' + str(comment_is_valid.errors))
+
+    return redirect('/')
+
+
+@login_required(login_url='/login/')
+def log_out(request):
+    """
+    Safely log out the user from the system.
+    :param request:
+    :return:
+    """
+    user = request.user
+    if user:
+        logout(request)
+
+    return render(request, 'dashboard/login.html', {'error_msg': 'User safely log out of the system', })
+
+
+@login_required(login_url='/login/')
+def render_comment_page(request):
+    """
+    Render Comment page for the selected Post.
+    :param request:
+    :return:
+    """
+    logger.info('Opening connecting comment page for Post.')
+
+    post_id = request.POST.get('post_id', '')
+    post_object = Post.objects.filter(id=post_id).first()
+
+    return render(request, 'dashboard/comment.html', {'post': post_object})
+

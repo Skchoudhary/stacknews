@@ -13,14 +13,27 @@
         <div class="container" style="background-color: lightcyan; max-height: 100%;">
 
             {% for post in post_obj %}
-                <h4>{{ post.title }}</h4>
+                <div>
+                    <span class="post_title"> {{ forloop.counter }}. {{ post.title }} {% if post.url %} ({{ post.url }}) {% endif %} </span>
+                </div>
                 <div class="row">
-                    <div class="col-md-6 col-xs-6 col-lg-6">
-                        {% if post.post_text %}<p class="">{{ post.post_text }}</p>{% endif %}
-                    </div>
-                    <div class="col-md-6 col-xs-6 col-lg-6" style="text-align: right">
-                        <span class="pull-right right">-- by {{ post.created_by.first_name }}</span>
-                    </div>
+                    {% if post.post_text %}
+                        <div class="col-md-6 col-xs-6 col-lg-6">
+                            <p class="">{{ post.post_text }}</p>
+                            <span onclick="javascript:$('#post_comment').click()">Comment</span>
+                            <form action="/dashboard/render_comment_page/" method="post" style="display: inline">
+                                {% csrf_token %}
+                                <input name="post_id" value="{{ post.id }}" hidden>
+                                <button type="submit" id="post_comment" class="btn" style="display: none"></button>
+                            </form>
+                        </div>
+                    {% endif %}
+
+                    {% if created_by.first_name %}
+                        <div class="col-md-6 col-xs-6 col-lg-6" style="text-align: right">
+                            <span class="pull-right right">-- by {{ post.created_by.first_name }}</span>
+                        </div>
+                    {% endif %}
                 </div>
             {% endfor %}
         </div>

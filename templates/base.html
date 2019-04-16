@@ -7,8 +7,13 @@
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}{% endblock %}</title>
-{#    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">#}
-        <link href="{% static 'bootstrap/css/bootstrap.min.css' %}" rel="stylesheet" type="text/css"/>
+    {#    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">#}
+    <link href="{% static 'bootstrap/css/bootstrap.min.css' %}" rel="stylesheet" type="text/css"/>
+    <style>
+        .post_title{
+            font-size: larger;
+        }
+    </style>
     {% block extrastyle %}{% endblock %}
 
     {% block extrascripts %}{% endblock %}
@@ -50,12 +55,15 @@
         </ul>
 
         <ul class="navbar-nav ml-auto">
-            <li class="nav-item navbar-right" hidden>
-                <a class="nav-link pull-right right " href="/dashboard/view_login">Sign-Out</a>
-            </li>
-            <li class="nav-item navbar-right">
-                <a class="nav-link pull-right right" href="/dashboard/view_login">Log-In</a>
-            </li>
+            {% if request.user.is_authenticated %}
+                <li class="nav-item navbar-right">
+                    <a class="nav-link pull-right right " href="/dashboard/log_out">Sign-Out</a>
+                </li>
+            {% else %}
+                <li class="nav-item navbar-right">
+                    <a class="nav-link pull-right right" href="/dashboard/view_login">Log-In</a>
+                </li>
+            {% endif %}
         </ul>
     </div>
 </nav>
