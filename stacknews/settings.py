@@ -13,14 +13,14 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-import configparser
+from configparser import RawConfigParser
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CONFIG_PATH = "stacknews/config.ini"
 
 # Read config file for setting up the project
 CONFIG_FILE = os.path.join(BASE_DIR, CONFIG_PATH)
-config = configparser.RawConfigParser()
+config = RawConfigParser()
 config.read(CONFIG_FILE)
 
 # Quick-start development settings - unsuitable for production

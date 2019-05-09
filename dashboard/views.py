@@ -129,7 +129,8 @@ def stacknews_login(request):
 
         else:
             logger.error("Authentication failed" + str(password) + str(username))
-            return render(request, 'dashboard/login.html', {'error_msg': 'Authentication failed', })
+
+    return render(request, 'dashboard/login.html', {'error_msg': 'Authentication failed', })
 
 
 @login_required(login_url='/login/')
@@ -171,3 +172,11 @@ def render_comment_page(request):
 
     return render(request, 'dashboard/comment.html', {'post': post_object})
 
+
+def view_login(request):
+    """
+
+    :param request:
+    :return:
+    """
+    return render(request, 'dashboard/login.html', {})
