@@ -3,6 +3,7 @@ import logging
 
 from django.contrib.auth.decorators import (login_required)
 from django.contrib.auth.models import (User)
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.db.models import (Q)
 from django.http import (HttpResponse)
 from django.contrib.auth import (authenticate, login as auth_login, logout, login)
@@ -12,6 +13,7 @@ from dashboard.models import (Post)
 
 # Constants
 logger = logging.getLogger(__name__)
+base_filter = (Q(is_active=True) & Q(to_show=True))
 
 
 def latest_post(request):
@@ -20,43 +22,21 @@ def latest_post(request):
     :param request:
     :return:
     """
-    post_obj = Post.objects.filter(is_active=True).filter(to_show=True).order_by('-creation_date')[:20]
+    page = request.GET.get('page', 0)
+    post_type = request.GET.get('post_type', 'P')
 
-    return render(request, 'dashboard/main_post.html', {'post_obj': post_obj})
+    post_obj = Post.objects.filter(is_active=True).filter(post_type=post_type).filter(to_show=True).order_by('-creation_date')
 
+    paginator = Paginator(post_obj, 30)
 
-@login_required(login_url='/')
-def add_post(request):
-    """
+    try:
+        posts = paginator.page(page)
+    except PageNotAnInteger:
+        posts = paginator.page(1)
+    except EmptyPage:
+        posts = paginator.page(paginator.num_pages)
 
-    :param request:
-    :return:
-    """
-    response = {'status': 'failure'}
-
-    post_data = PostForm({'post_type': request.POST.get('post_type', 'P'), 'title': request.POST.get('post_title', ''), 'post_text': request.POST.get('post_text', ''), 'url': request.POST.get('post_URL', ''), 'created_by': request.user.id})
-    if post_data.is_valid():
-        post_data.save()
-        response['status'] = 'success'
-    else:
-        logger.error('Error while saving the post ' + str(post_data.errors))
-
-    return redirect('/')
-
-
-def remove_post(request):
-    """
-
-    :param request:
-    :return:
-    """
-    post_id = request.POST.get('post_id', '')
-    post_obj = Post.objects.filter(Q(to_show=1) & Q(active=1)).filter(pk=post_id)
-
-    if post_obj:
-        post_obj.update(active=0, to_show=0)
-
-    return redirect('/dashboard/landing_view')
+    return render(request, 'dashboard/main_post.html', {'post_obj': posts})
 
 
 def create_new_user(request):
@@ -127,7 +107,7 @@ def remove_user(request):
     return HttpResponse(json.dumps(response), content_type='application/json')
 
 
-def stocknews_login(request):
+def stacknews_login(request):
     """
     Method to authenticate the user.
     :param request:
@@ -161,26 +141,6 @@ def new_post(request):
     """
 
     return render(request, 'dashboard/submit.html')
-
-
-@login_required(login_url='/login/')
-def comment(request):
-    """
-    Comment save method against a post.
-    :param request:
-    :return:
-    """
-    comment_text = request.POST.get('comment', '')
-    linked_post = request.POST.get('linked_post', '')
-
-    comment_is_valid = CommentForm({'post': linked_post, 'comment_text': comment_text, 'user': request.user.id})
-
-    if comment_is_valid.is_valid():
-        comment_is_valid.save()
-    else:
-        logger.info('Comment data is invalid ' + str(comment_is_valid.errors))
-
-    return redirect('/')
 
 
 @login_required(login_url='/login/')

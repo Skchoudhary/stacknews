@@ -1,5 +1,8 @@
-from django.conf.urls import url, include
-from dashboard.views import latest_post, create_new_user, stocknews_login, new_post, add_post, comment, log_out, render_comment_page
+from django.conf.urls import (url, include)
+
+from dashboard.view_wrapper.post import add_post
+from dashboard.views import (latest_post, create_new_user, stocknews_login, new_post, comment, log_out, render_comment_page)
+
 
 ajax_url = [
     url(r'^fetch_latest_post/', latest_post, name='latest_post')
