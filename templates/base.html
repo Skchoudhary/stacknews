@@ -35,7 +35,7 @@
                 <a class="nav-link" href="#">Thread</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="#">Post</a>
+                <a class="nav-link" href="/dashboard/">Post</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="#">Comment</a>
@@ -57,7 +57,7 @@
         <ul class="navbar-nav ml-auto">
             {% if request.user.is_authenticated %}
                 <li class="nav-item navbar-right">
-                    <a class="nav-link pull-right right " href="/dashboard/log_out">Sign-Out</a>
+                    <a class="nav-link pull-right right " href="/dashboard/logout">Sign-Out</a>
                 </li>
             {% else %}
                 <li class="nav-item navbar-right">

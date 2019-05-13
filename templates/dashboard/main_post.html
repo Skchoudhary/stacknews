@@ -14,10 +14,10 @@
 
             {% for post in post_obj %}
                 <div>
-                    <span class="post_title"> {{ forloop.counter }}. {{ post.title }} {% if post.url %} ({{ post.url }}) {% endif %} </span>
+                    <a href=" {% if post.url %} {{ post.url }} {% else %} # {% endif %}">{{ forloop.counter }}. {{ post.title }} ({{ post.created_by.username }})</a>
                 </div>
                 <div class="row">
-                    {% if post.post_text %}
+                    {% if post.title %}
                         <div class="col-md-6 col-xs-6 col-lg-6">
                             <p class="">{{ post.post_text }}</p>
                             <span onclick="javascript:$('#post_comment').click()">Comment</span>

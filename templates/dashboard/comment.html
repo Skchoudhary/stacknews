@@ -30,6 +30,15 @@
                         </div>
                     </form>
                 </div>
+                {% for comment in comments %}
+                    <div class="col-md-12 col-xs-12 col-lg-12 centre">
+
+                        <p>{{ comment.creation_date }}</p>
+
+                        <p>{{ comment.comment_text }}</p>
+
+                    </div>
+                {% endfor %}
             </div>
         </div>
     </div>

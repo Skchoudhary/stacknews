@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 base_filter = (Q(is_active=True) & Q(to_show=True))
 
 
-@login_required(login_url='/')
+@login_required(login_url='/dashboard/login/')
 def add_post(request):
     """
 
@@ -30,7 +30,7 @@ def add_post(request):
     return redirect('/')
 
 
-@login_required(login_url='/')
+@login_required(login_url='/dashboard/login/')
 def remove_post(request):
     """
 

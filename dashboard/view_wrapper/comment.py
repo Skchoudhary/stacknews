@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 base_filter = (Q(is_active=True) & Q(to_show=True))
 
 
-@login_required(login_url='/login/')
+@login_required(login_url='/dashboard/login/')
 def comment(request):
     """
     Comment save method against a post.

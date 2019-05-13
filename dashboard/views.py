@@ -9,7 +9,7 @@ from django.http import (HttpResponse)
 from django.contrib.auth import (authenticate, login as auth_login, logout, login)
 from django.shortcuts import (redirect, render)
 from dashboard.forms import (UserForm, PostForm, CommentForm)
-from dashboard.models import (Post)
+from dashboard.models import (Post, Comment)
 
 # Constants
 logger = logging.getLogger(__name__)
@@ -18,7 +18,7 @@ base_filter = (Q(is_active=True) & Q(to_show=True))
 
 def latest_post(request):
     """
-    Fetch latest 20 post shared
+    Fetch latest post.
     :param request:
     :return:
     """
@@ -133,7 +133,7 @@ def stacknews_login(request):
     return render(request, 'dashboard/login.html', {'error_msg': 'Authentication failed', })
 
 
-@login_required(login_url='/login/')
+@login_required(login_url='/dashboard/login/')
 def new_post(request):
     """
     
@@ -144,7 +144,7 @@ def new_post(request):
     return render(request, 'dashboard/submit.html')
 
 
-@login_required(login_url='/login/')
+@login_required(login_url='/dashboard/login/')
 def log_out(request):
     """
     Safely log out the user from the system.
@@ -158,7 +158,7 @@ def log_out(request):
     return render(request, 'dashboard/login.html', {'error_msg': 'User safely log out of the system', })
 
 
-@login_required(login_url='/login/')
+@login_required(login_url='/dashboard/login/')
 def render_comment_page(request):
     """
     Render Comment page for the selected Post.
@@ -169,8 +169,9 @@ def render_comment_page(request):
 
     post_id = request.POST.get('post_id', '')
     post_object = Post.objects.filter(id=post_id).first()
+    comment_object = Comment.objects.filter(base_filter).filter(post=post_id)
 
-    return render(request, 'dashboard/comment.html', {'post': post_object})
+    return render(request, 'dashboard/comment.html', {'post': post_object, 'comments': comment_object})
 
 
 def view_login(request):
