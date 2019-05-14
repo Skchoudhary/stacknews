@@ -14,13 +14,14 @@
 
             {% for post in post_obj %}
                 <div>
-                    <a href=" {% if post.url %} {{ post.url }} {% else %} # {% endif %}">{{ forloop.counter }}. {{ post.title }} ({{ post.created_by.username }})</a>
+                    <a href="{% if post.url %} {{ post.url }} {% else %} # {% endif %}" class="text-dark">{{ forloop.counter }}. {{ post.title }} <span
+                            class="small text-black-50">({{ post.created_by.username }})</span></a>
+                    <p class="small text-black-50">0 points by {{ post.created_by.username }} {{ post.creation_date|timesince }} | hide | past | web | <span onclick="javascript:$('#post_comment').click()">discuss</span></p>
                 </div>
                 <div class="row">
                     {% if post.title %}
                         <div class="col-md-6 col-xs-6 col-lg-6">
                             <p class="">{{ post.post_text }}</p>
-                            <span onclick="javascript:$('#post_comment').click()">Comment</span>
                             <form action="/dashboard/render_comment_page/" method="post" style="display: inline">
                                 {% csrf_token %}
                                 <input name="post_id" value="{{ post.id }}" hidden>
