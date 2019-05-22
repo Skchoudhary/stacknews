@@ -1,10 +1,10 @@
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import CharField, URLField, IntegerField, BooleanField
+from django.utils import timezone
+from django.urls import reverse
 
 # CONSTANTS
-from django.utils import timezone
-
 POST_TYPE = (
     ('P', 'Post'),
     ('J', 'Job Post'),
@@ -42,10 +42,16 @@ class Comment(BasicDetails):
     """
     Details about the comment on the post.
     """
-    post = models.ForeignKey(Post, related_name='%(class)s_comment_post', null=False)
-    user = models.ForeignKey(User, null=False)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='users')
 
     comment_text = CharField(max_length=3000, default='', blank=True)
+
+    def __str__(self):
+        return self.comment_text
+
+    def get_absolute_url(self):
+        return reverse('comment_detail', args=[str(self.id)])
 
 
 class KarmaPoint(BasicDetails):
@@ -56,3 +62,9 @@ class KarmaPoint(BasicDetails):
     user = models.ForeignKey(User, null=False)
 
     count = IntegerField(default=0, null=False)
+
+    def __str__(self):
+        return self
+
+    def get_absolute_url(self):
+        return reverse('karma_point', args=[str(self.id)])
